@@ -115,15 +115,14 @@ class ModelSearchAspect extends SearchAspect
         $searchTerms = explode(' ', $term);
 
         $query->where(function (Builder $query) use ($attributes, $term, $searchTerms) {
-            foreach (Arr::wrap($attributes) as $attribute) {
-                foreach ($searchTerms as $searchTerm) {
-                    $sql = "LOWER({$attribute->getAttribute()}) LIKE ?";
-                    $searchTerm = mb_strtolower($searchTerm, 'UTF8');
+            foreach ($this->attributes as $attribute) {
+                $sql = "LOWER({$attribute->getAttribute()}) LIKE ?";
 
-                    $attribute->isPartial()
-                        ? $query->orWhereRaw($sql, ["%{$searchTerm}%"])
-                        : $query->orWhere($attribute->getAttribute(), $searchTerm);
-                }
+                $term = mb_strtolower($term, 'UTF8');
+
+                $attribute->isPartial()
+                    ? $query->orWhereRaw($sql, ["%{$term}%"])
+                    : $query->orWhere($attribute->getAttribute(), $term);
             }
         });
     }
